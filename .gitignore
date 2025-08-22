@@ -1,0 +1,16 @@
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Fichiers sensibles
+.env
+
+# Dossiers à ignorer
+/vendor/
+/node_modules/
+/__pycache__/
+/flutter_build/
+/build/
