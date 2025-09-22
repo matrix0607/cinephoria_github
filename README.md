@@ -46,7 +46,8 @@ Ce projet a été réalisé dans le cadre de l'ECF et est composé de plusieurs 
    git clone https://github.com/matth0607/cinephoria_github.git
 
 
-   ## 🧪 Environnement de tests
+
+## 🧪 Environnement Tests
 
 L’application API Flask dispose d’un environnement de test complet :
 
