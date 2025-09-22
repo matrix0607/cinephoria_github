@@ -2,27 +2,39 @@
 include 'includes/header.php';
 include 'config/db.php';
 
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Vérification utilisateur connecté
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: " . BASE_URL . "/login.php");
     exit;
 }
 
+// Vérification méthode POST
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     echo "<div class='alert'>❌ Accès interdit.</div>";
     exit;
 }
 
-$seance_id = $_POST['seance_id'];
-$nombre = $_POST['nombre'];
+$seance_id = $_POST['seance_id'] ?? null;
+$nombre = $_POST['nombre'] ?? null;
 $places = $_POST['places'] ?? [];
 
-// Vérification séance
-$stmt = $pdo->prepare("SELECT s.*, sa.nom AS salle_nom, sa.nombre_places, f.titre
-                       FROM seances s
-                       JOIN salles sa ON s.salle_id = sa.id
-                       JOIN films f ON s.film_id = f.id
-                       WHERE s.id = ? FOR UPDATE");
+if (!$seance_id || !$nombre || empty($places)) {
+    echo "<div class='alert'>❌ Données manquantes pour la réservation.</div>";
+    exit;
+}
+
+// 🔎 Vérification séance avec film et salle
+$stmt = $pdo->prepare("
+    SELECT s.*, sa.nom AS salle_nom, sa.nombre_places, f.titre
+    FROM seances s
+    JOIN salles sa ON s.salle_id = sa.id
+    JOIN films f ON s.film_id = f.id
+    WHERE s.id = ?
+");
 $stmt->execute([$seance_id]);
 $seance = $stmt->fetch();
 
@@ -31,13 +43,25 @@ if (!$seance) {
     exit;
 }
 
-// Vérif sièges déjà pris
-$stmt = $pdo->prepare("SELECT numero_place FROM places_reservees
-                       JOIN reservations r ON r.id = places_reservees.reservation_id
-                       WHERE r.seance_id = ?");
+// 🔎 Vérification des places déjà prises
+$stmt = $pdo->prepare("
+    SELECT numero_place FROM places_reservees
+    JOIN reservations r ON r.id = places_reservees.reservation_id
+    WHERE r.seance_id = ?
+");
 $stmt->execute([$seance_id]);
 $places_occupees = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
+// 🔎 Vérification des places PMR (si table exists)
+$places_pmr = [];
+$checkPMR = $pdo->query("SHOW TABLES LIKE 'places_pmr'")->rowCount();
+if ($checkPMR) {
+    $pmrStmt = $pdo->prepare("SELECT numero_place FROM places_pmr WHERE salle_id = ?");
+    $pmrStmt->execute([$seance['salle_id']]);
+    $places_pmr = $pmrStmt->fetchAll(PDO::FETCH_COLUMN);
+}
+
+// Vérification des places sélectionnées
 foreach ($places as $place) {
     if ($place < 1 || $place > $seance['nombre_places'] || in_array($place, $places_occupees)) {
         echo "<div class='alert'>❌ Siège $place invalide ou déjà réservé.</div>";
@@ -45,16 +69,23 @@ foreach ($places as $place) {
     }
 }
 
-// Calcul prix
-$prix_par_personne = 12.00; // ajustable
-$prix_total = $nombre * $prix_par_personne;
+// 💰 Prix selon qualité
+$tarifStmt = $pdo->prepare("SELECT prix FROM tarifs WHERE qualite = ? LIMIT 1");
+$tarifStmt->execute([$seance['qualite']]);
+$prix_par_personne = $tarifStmt->fetchColumn();
+if (!$prix_par_personne) $prix_par_personne = 12.00;
 
-// Enregistrement réservation
-$stmt = $pdo->prepare("INSERT INTO reservations (utilisateur_id, seance_id, nombre_personnes, prix_total)
-                       VALUES (?, ?, ?, ?)");
-$stmt->execute([$_SESSION['user_id'], $seance_id, $nombre, $prix_total]);
+$prix_total = count($places) * $prix_par_personne;
+
+// ✅ Enregistrement réservation
+$stmt = $pdo->prepare("
+    INSERT INTO reservations (utilisateur_id, seance_id, nombre_personnes, prix_total, date_reservation)
+    VALUES (?, ?, ?, ?, NOW())
+");
+$stmt->execute([$_SESSION['user_id'], $seance_id, count($places), $prix_total]);
 $reservation_id = $pdo->lastInsertId();
 
+// ✅ Enregistrement des places
 foreach ($places as $place) {
     $stmt = $pdo->prepare("INSERT INTO places_reservees (reservation_id, numero_place) VALUES (?, ?)");
     $stmt->execute([$reservation_id, $place]);
@@ -99,12 +130,12 @@ foreach ($places as $place) {
 
 <div class="confirm-box">
     <h2>✅ Réservation confirmée</h2>
-    <p><strong>Réf:</strong> <?= $reservation_id ?></p>
-    <p><strong>Film:</strong> <?= htmlspecialchars($seance['titre']) ?></p>
-    <p><strong>Salle:</strong> <?= htmlspecialchars($seance['salle_nom']) ?> — 
-       <strong>Sièges:</strong> <?= implode(", ", $places) ?></p>
-    <p><strong>Prix total:</strong> <?= number_format($prix_total, 2) ?> €</p>
-    <a href="mon_espace.php" class="btn-retour">🎟️ Voir mes réservations</a>
+    <p><strong>Réf :</strong> <?= $reservation_id ?></p>
+    <p><strong>Film :</strong> <?= htmlspecialchars($seance['titre']) ?></p>
+    <p><strong>Salle :</strong> <?= htmlspecialchars($seance['salle_nom']) ?></p>
+    <p><strong>Sièges :</strong> <?= implode(", ", $places) ?></p>
+    <p><strong>Prix total :</strong> <?= number_format($prix_total, 2) ?> €</p>
+    <a href="<?= BASE_URL ?>/mon_espace.php" class="btn-retour">🎟️ Voir mes réservations</a>
 </div>
 
 <?php include 'includes/footer.php'; ?>

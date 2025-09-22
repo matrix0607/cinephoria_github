@@ -32,8 +32,8 @@ INSERT INTO `genres` (`id`, `nom`) VALUES
 (1, 'Action'),
 (2, 'Comédie');
 
-INSERT INTO `incidents` (`id`, `salle_id`, `description`, `date_creation`) VALUES
-(1, '1', 'siege 2', '2025-08-21 14:06:46');
+INSERT INTO `incidents` (`id`, `salle_id`, `description`, `date_creation`, `statut`) VALUES
+(1, '1', 'siege 2', '2025-08-21 14:06:46', 'ouvert');
 
 INSERT INTO `places_reservees` (`id`, `reservation_id`, `numero_place`, `mobilite_reduite`) VALUES
 (1, 1, 2, 0),
@@ -120,6 +120,8 @@ INSERT INTO `seances` (`id`, `film_id`, `salle_id`, `date_heure_debut`, `date_he
 INSERT INTO `tarifs` (`qualite`, `prix`) VALUES
 ('3D', 12.00),
 ('4K', 10.00),
+('2D', 8.00),
+('4DX', 14.00),
 ('HD', 8.00);
 
 INSERT INTO `utilisateurs` (`id`, `email`, `mot_de_passe`, `prenom`, `nom`, `pseudo`, `role`, `date_creation`, `reset_required`) VALUES

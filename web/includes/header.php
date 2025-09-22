@@ -1,4 +1,3 @@
-
 <?php
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -17,9 +16,11 @@ if (session_status() === PHP_SESSION_NONE) {
             background: linear-gradient(to bottom, #1e2a38, #3a4a5a);
             color: #fff;
         }
+
         header {
             background-color: #111;
         }
+
         .user-info {
             text-align: right;
             padding: 10px 20px;
@@ -27,6 +28,7 @@ if (session_status() === PHP_SESSION_NONE) {
             background-color: #1a1a1a;
             line-height: 1.4;
         }
+
         .grid-menu {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -35,6 +37,7 @@ if (session_status() === PHP_SESSION_NONE) {
             margin: 0 auto;
             padding: 10px;
         }
+
         .grid-menu a {
             display: block;
             background-color: #2c3e50;
@@ -46,7 +49,8 @@ if (session_status() === PHP_SESSION_NONE) {
             font-weight: bold;
             transition: background-color 0.3s ease;
         }
-        .grid-menu a:hover {
+
+        .grid-menu a:hover, .grid-menu a.active {
             background-color: #3e5870;
         }
     </style>
@@ -73,23 +77,22 @@ if (session_status() === PHP_SESSION_NONE) {
                 </strong>
             </div>
         <?php endif; ?>
+
         <nav class="grid-menu">
-            <a href="/cinephoria/index.php">Accueil</a>
+            <a href="/cinephoria/index.php" class="<?= basename($_SERVER['PHP_SELF']) === 'index.php' ? 'active' : '' ?>">Accueil</a>
             <?php if (isset($_SESSION['pseudo'])): ?>
-                <a href="/cinephoria/mon_espace.php">Mon espace</a>
+                <a href="/cinephoria/mon_espace.php" class="<?= basename($_SERVER['PHP_SELF']) === 'mon_espace.php' ? 'active' : '' ?>">Mon espace</a>
                 <?php if ($_SESSION['role'] === 'admin'): ?>
-                    <a href="/cinephoria/admin/index.php">Administration</a>
+                    <a href="/cinephoria/admin/index.php" class="<?= basename($_SERVER['PHP_SELF']) === 'index.php' ? 'active' : '' ?>">Administration</a>
                 <?php elseif ($_SESSION['role'] === 'employe'): ?>
-                    <a href="/cinephoria/employe/index.php">Espace Employé</a>
+                    <a href="/cinephoria/employe/index.php" class="<?= basename($_SERVER['PHP_SELF']) === 'index.php' ? 'active' : '' ?>">Espace Employé</a>
                 <?php endif; ?>
                 <a href="/cinephoria/logout.php">Se déconnecter</a>
             <?php else: ?>
-                <a href="/cinephoria/login.php">Se connecter</a>
+                <a href="/cinephoria/login.php" class="<?= basename($_SERVER['PHP_SELF']) === 'login.php' ? 'active' : '' ?>">Se connecter</a>
             <?php endif; ?>
-            <a href="/cinephoria/reservation.php">Réservation</a>
-            <a href="/cinephoria/films.php">Films</a>
-            <a href="/cinephoria/contact.php">Contact</a>
+            <a href="/cinephoria/reservation.php" class="<?= basename($_SERVER['PHP_SELF']) === 'reservation.php' ? 'active' : '' ?>">Réservation</a>
+            <a href="/cinephoria/films.php" class="<?= basename($_SERVER['PHP_SELF']) === 'films.php' ? 'active' : '' ?>">Films</a>
+            <a href="/cinephoria/contact.php" class="<?= basename($_SERVER['PHP_SELF']) === 'contact.php' ? 'active' : '' ?>">Contact</a>
         </nav>
     </header>
-</body>
-</html>

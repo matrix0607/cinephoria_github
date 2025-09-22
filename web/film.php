@@ -1,4 +1,3 @@
-
 <?php
 include 'includes/header.php';
 include 'config/db.php';
@@ -20,11 +19,11 @@ foreach ($tarifStmt as $row) {
 
 // Récupération des infos du film
 $stmt = $pdo->prepare("SELECT films.*, genres.nom AS genre_nom,
-                              ROUND(AVG(notes.note), 1) AS moyenne_note,
-                              COUNT(notes.id) AS nb_notes
+                              ROUND(AVG(avis.note), 1) AS moyenne_note,
+                              COUNT(avis.id) AS nb_notes
                        FROM films
                        LEFT JOIN genres ON films.genre_id = genres.id
-                       LEFT JOIN notes ON films.id = notes.film_id
+                       LEFT JOIN avis ON films.id = avis.film_id
                        WHERE films.id = ?
                        GROUP BY films.id");
 $stmt->execute([$filmId]);
@@ -46,16 +45,14 @@ if (!$film) {
 }
 
 .film-detail h2 {
-    
-text-align: center;
-    font-size: 3em; /* plus gros */
+    text-align: center;
+    font-size: 3em;
     margin-bottom: 20px;
-    color: #fff; /* blanc */
-    background-color: #222; /* fond sombre pour contraste */
+    color: #fff;
+    background-color: #222;
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-
 }
 
 .film-detail img {
@@ -113,11 +110,11 @@ text-align: center;
 </style>
 
 <div class="film-detail">
-    <h2><?= $film['titre'] ?></h2>
-    <img src="assets/images/<?= $film['affiche'] ?>" alt="<?= $film['titre'] ?>">
-    <p><?= $film['description'] ?></p>
-    <p><strong>Genre :</strong> <?= $film['genre_nom'] ?></p>
-    <p><strong>Âge minimum :</strong> <?= $film['age_minimum'] ?> ans</p>
+    <h2><?= htmlspecialchars($film['titre']) ?></h2>
+    <img src="assets/images/<?= htmlspecialchars($film['affiche']) ?>" alt="<?= htmlspecialchars($film['titre']) ?>">
+    <p><?= htmlspecialchars($film['description']) ?></p>
+    <p><strong>Genre :</strong> <?= htmlspecialchars($film['genre_nom']) ?></p>
+    <p><strong>Âge minimum :</strong> <?= htmlspecialchars($film['age_minimum']) ?> ans</p>
     <?php if (!empty($film['coup_de_coeur'])): ?>
         <p><span class="badge">❤️ Coup de cœur</span></p>
     <?php endif; ?>
@@ -140,6 +137,7 @@ text-align: center;
         <table class="styled-table">
             <thead>
                 <tr>
+                    <th>Cinéma</th>
                     <th>Jour</th>
                     <th>Heure</th>
                     <th>Qualité</th>
@@ -150,15 +148,14 @@ text-align: center;
             <tbody>
                 <?php foreach ($seances as $seance): ?>
                     <tr>
+                        <td><?= htmlspecialchars($seance['ville']) ?></td>
                         <td><?= date('d/m/Y', strtotime($seance['date_heure_debut'])) ?></td>
                         <td><?= date('H:i', strtotime($seance['date_heure_debut'])) ?> - <?= date('H:i', strtotime($seance['date_heure_fin'])) ?></td>
-                        <td><?= $seance['qualite'] ?></td>
+                        <td><?= htmlspecialchars($seance['qualite']) ?></td>
                         <td><?= isset($tarifs[$seance['qualite']]) ? number_format($tarifs[$seance['qualite']], 2) . ' €' : 'Tarif inconnu' ?></td>
                         <td>
-                            <form action="reservation.php" method="GET">
-                                <input type="hidden" name="film_id" value="<?= $film['id'] ?>">
+                            <form action="reservation-details.php" method="GET">
                                 <input type="hidden" name="seance_id" value="<?= $seance['id'] ?>">
-                                <input type="hidden" name="cinema" value="<?= $seance['ville'] ?>">
                                 <button type="submit" class="btn-reserver">Réserver</button>
                             </form>
                         </td>
