@@ -76,13 +76,3 @@ L’application API Flask dispose d’un environnement de test complet :
 - **Base de données** : mots de passe hashés (bcrypt), accès limité aux données sensibles, sauvegardes régulières
 
 
-
-
-
-
-   
-
-
-
-   ```bash
-   git clone https://github.com/matth0607/cinephoria_github.git
