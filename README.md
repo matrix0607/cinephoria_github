@@ -44,3 +44,44 @@ Ce projet a été réalisé dans le cadre de l'ECF et est composé de plusieurs 
 2. Cloner le dépôt dans le dossier `htdocs` :  
    ```bash
    git clone https://github.com/matth0607/cinephoria_github.git
+
+
+   ## 🧪 Environnement de tests
+
+L’application API Flask dispose d’un environnement de test complet :
+
+- Tests unitaires
+- Tests fonctionnels (endpoints API)
+- Tests d’intégration (API + base MySQL)
+
+### ⚙️ Préparation
+
+1. **Créer la base de données de test** :  
+   - Accéder à http://localhost/phpmyadmin  
+   - Créer une base `cinephoria_test`  
+   - Importer `cinephoria.sql` puis `insert_data.sql`  
+
+2. **Installer l’environnement Python** :  
+   ```bash
+   python -m venv .venv
+   .venv\Scripts\activate  # Windows
+   source .venv/bin/activate  # Mac/Linux
+   pip install Flask mysql-connector-python pytest requests python-dotenv
+
+## 🔒 Sécurité
+
+- **Front-end** : validation des données utilisateurs pour prévenir les attaques XSS  
+- **Back-end** : JWT pour sécuriser les échanges mobile, contrôle des rôles, protection contre injections SQL via requêtes préparées  
+- **Base de données** : mots de passe hashés (bcrypt), accès limité aux données sensibles, sauvegardes régulières
+
+
+
+
+
+
+   
+
+
+
+   ```bash
+   git clone https://github.com/matth0607/cinephoria_github.git
