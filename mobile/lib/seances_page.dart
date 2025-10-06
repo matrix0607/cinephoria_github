@@ -1,7 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io'; // <- pour SocketException
 import 'package:intl/intl.dart';
 
 import 'qr_code_page.dart'; // Import de la page QR code
@@ -25,12 +26,12 @@ class Seance {
 
   factory Seance.fromJson(Map<String, dynamic> json) {
     return Seance(
-      film: json['film'],
-      affiche: json['affiche'],
-      salle: json['salle'],
-      dateDebut: json['date_heure_debut'],
-      dateFin: json['date_heure_fin'],
-      nombrePersonnes: json['nombre_personnes'],
+      film: json['film'] ?? '',
+      affiche: json['affiche'] ?? '',
+      salle: json['salle'] ?? '',
+      dateDebut: json['date_heure_debut'] ?? '',
+      dateFin: json['date_heure_fin'] ?? '',
+      nombrePersonnes: json['nombre_personnes'] ?? 0,
     );
   }
 }
@@ -55,15 +56,24 @@ class _SeancesPageState extends State<SeancesPage> {
   }
 
   Future<List<Seance>> fetchSeances() async {
-    final response = await http.get(
-      Uri.parse('http://192.168.169.123/cinephoria/api/getUserSessions.php?user_id=${widget.userId}'),
-    );
+    final url = Uri.parse(
+        'http://10.0.2.2/cinephoria/api/getUserSessions.php?user_id=${widget.userId}');
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      return data.map((json) => Seance.fromJson(json)).toList();
-    } else {
-      throw Exception('Erreur lors du chargement des séances');
+    try {
+      final response = await http.get(url).timeout(const Duration(seconds: 5));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        return data.map((json) => Seance.fromJson(json)).toList();
+      } else {
+        throw Exception('Erreur serveur : ${response.statusCode}');
+      }
+    } on TimeoutException {
+      throw Exception('⏳ Timeout : le serveur ne répond pas.');
+    } on SocketException {
+      throw Exception('❌ Impossible de se connecter au serveur.');
+    } catch (e) {
+      throw Exception('Erreur : $e');
     }
   }
 
@@ -91,7 +101,13 @@ class _SeancesPageState extends State<SeancesPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Erreur : ${snapshot.error}'));
+            return Center(
+              child: Text(
+                snapshot.error.toString(),
+                style: const TextStyle(color: Colors.red, fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+            );
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(
               child: Text(
@@ -104,8 +120,8 @@ class _SeancesPageState extends State<SeancesPage> {
             final seancesDuJour = snapshot.data!.where((seance) {
               final date = DateTime.parse(seance.dateDebut);
               return date.year == today.year &&
-                     date.month == today.month &&
-                     date.day == today.day;
+                  date.month == today.month &&
+                  date.day == today.day;
             }).toList();
 
             final seancesAVenir = snapshot.data!.where((seance) {
@@ -120,20 +136,24 @@ class _SeancesPageState extends State<SeancesPage> {
                     padding: EdgeInsets.all(8.0),
                     child: Text(
                       'Séances du jour',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ),
-                ...seancesDuJour.map((seance) => buildSeanceCard(seance, dateFormatter)),
+                ...seancesDuJour
+                    .map((seance) => buildSeanceCard(seance, dateFormatter)),
 
                 if (seancesAVenir.isNotEmpty)
                   const Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Text(
                       'Séances à venir',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ),
-                ...seancesAVenir.map((seance) => buildSeanceCard(seance, dateFormatter)),
+                ...seancesAVenir
+                    .map((seance) => buildSeanceCard(seance, dateFormatter)),
               ],
             );
           }
@@ -147,9 +167,19 @@ class _SeancesPageState extends State<SeancesPage> {
       margin: const EdgeInsets.all(8),
       child: ListTile(
         leading: Image.network(
-          'http://192.168.169.123/cinephoria/assets/images/${seance.affiche}',
+          'http://10.0.2.2/cinephoria/assets/images/${seance.affiche}',
           width: 50,
           fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return const SizedBox(
+              width: 50,
+              height: 50,
+              child: Center(
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            );
+          },
           errorBuilder: (context, error, stackTrace) =>
               const Icon(Icons.image_not_supported),
         ),

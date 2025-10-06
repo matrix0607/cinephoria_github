@@ -75,4 +75,13 @@ L’application API Flask dispose d’un environnement de test complet :
 - **Back-end** : JWT pour sécuriser les échanges mobile, contrôle des rôles, protection contre injections SQL via requêtes préparées  
 - **Base de données** : mots de passe hashés (bcrypt), accès limité aux données sensibles, sauvegardes régulières
 
+## 📂 Maquettes
+
+Toutes les maquettes sont organisées dans le dossier `docs/Maquettes/` :  
+
+- [Maquettes Web](docs/Maquettes/Web/README.md)  
+- [Maquettes Mobile](docs/Maquettes/Mobile/README.md)  
+- [Maquettes Bureautique](docs/Maquettes/Bureautique/README.md)  
+
+Ces dossiers contiennent toutes les captures d’écran et PDF des interfaces.
 
