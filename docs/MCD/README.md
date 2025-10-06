@@ -24,4 +24,4 @@ Le MCD permet de visualiser les relations entre les différentes entités du sys
 - Des **incidents** peuvent être liés à une salle spécifique.
 
 ## 📂 Fichier du schéma
-🖼️ [MCD_Cinephoria.png](./MCD_Cinephoria.png)
+🖼️ [MCD_Cinephoria.png](./MCD_Cinephoria.pdf)
