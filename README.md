@@ -99,3 +99,24 @@ Ces dossiers contiennent toutes les captures d’écran et PDF des interfaces.
 Le schéma d'architecture montre les interactions entre Web, Mobile, Bureautique, API et Bases de données.
 
 📂 Dossier du schéma : [docs/architecture](docs/architecture)
+
+---
+
+## 🧩 Modèle Conceptuel de Données (MCD)
+
+Le **Modèle Conceptuel de Données** du projet **Cinéphoria** illustre la structure et les relations entre les principales entités de l’application.
+
+### 📘 Entités principales
+- **Utilisateur** : gère les comptes clients, employés et administrateurs.  
+- **Film** : informations sur les films (titre, genre, durée, note, etc.).  
+- **Séance** : relie un film et une salle à une date précise.  
+- **Réservation** : enregistre les achats effectués par les utilisateurs.  
+- **Salle** : représente les salles avec leur capacité et qualité de projection.  
+- **Cinéma** : regroupe les salles d’un même établissement.  
+- **Avis / Notes** : retours et évaluations des utilisateurs.  
+- **Incidents** : problèmes déclarés sur les équipements.
+
+📂 Le schéma complet est disponible ici :  
+👉 [docs/MCD/MCD_Cinephoria.pdf](./docs/MCD/MCD_Cinephoria.pdf)
+
+---
