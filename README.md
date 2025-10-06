@@ -79,9 +79,9 @@ L’application API Flask dispose d’un environnement de test complet :
 
 Toutes les maquettes sont organisées dans le dossier `docs/Maquettes/` :  
 
-- [Maquettes Web](docs\maquettes\web/README.md)  
-- [Maquettes Mobile](docs\maquettes\mobile/README.md)  
-- [Maquettes Bureautique](docs\maquettes\bureautique/README.md)  
+- [Maquettes Web](docs/maquettes/web/README.md)  
+- [Maquettes Mobile](docs/maquettes/mobile/README.md)  
+- [Maquettes Bureautique](docs/maquettes/bureautique/README.md)  
 
 Ces dossiers contiennent toutes les captures d’écran et PDF des interfaces.
 
