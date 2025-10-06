@@ -45,7 +45,7 @@ Ce projet a été réalisé dans le cadre de l'ECF et est composé de plusieurs 
    ```bash
    git clone https://github.com/matth0607/cinephoria_github.git
 
-
+---
 
 ## 🧪 Environnement Tests
 
@@ -54,6 +54,8 @@ L’application API Flask dispose d’un environnement de test complet :
 - Tests unitaires
 - Tests fonctionnels (endpoints API)
 - Tests d’intégration (API + base MySQL)
+
+---
 
 ### ⚙️ Préparation
 
@@ -69,11 +71,15 @@ L’application API Flask dispose d’un environnement de test complet :
    source .venv/bin/activate  # Mac/Linux
    pip install Flask mysql-connector-python pytest requests python-dotenv
 
+   ---
+
 ## 🔒 Sécurité
 
 - **Front-end** : validation des données utilisateurs pour prévenir les attaques XSS  
 - **Back-end** : JWT pour sécuriser les échanges mobile, contrôle des rôles, protection contre injections SQL via requêtes préparées  
 - **Base de données** : mots de passe hashés (bcrypt), accès limité aux données sensibles, sauvegardes régulières
+
+---
 
 ## 📂 Maquettes
 
@@ -85,3 +91,11 @@ Toutes les maquettes sont organisées dans le dossier `docs/Maquettes/` :
 
 Ces dossiers contiennent toutes les captures d’écran et PDF des interfaces.
 
+---
+
+
+## Schéma d'architecture
+
+Le schéma d'architecture montre les interactions entre Web, Mobile, Bureautique, API et Bases de données.
+
+📂 Dossier du schéma : [docs/architecture](docs/architecture)
